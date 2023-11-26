@@ -1,0 +1,26 @@
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    vmImage: windows-2019
+  steps:
+  - checkout: self
+    clean: true
+    fetchTags: false
+  - task: id-az-pipeline.jmeter-perf-analyzer.custom-build-release-task.perfanalyzer@1
+    displayName: Run Perf Analyzer
+    inputs:
+      jmxsourceRunFilePath: sample-load-test.jmx
+      jmeterLogFolder: CurrentLog
+      jmeterReportFolder: CurrentReport
+  - task: LakshayKaushik.PublishHTMLReports.publishhtmlreport.publishhtmlreport@1
+    displayName: publishhtmlreport
+    continueOnError: True
+    inputs:
+      htmlType: Jmeter
+      JmeterReportsPath: $(Pipeline.Workspace)\s\apache-jmeter-5.5\bin\CurrentReport
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Pipeline Artifact
+    inputs:
+      artifactName: workspace
+...
